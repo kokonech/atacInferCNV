@@ -15,8 +15,11 @@ install("path/to/the/source/code")
 
 The example data input data is located [here](https://drive.google.com/drive/folders/1okTZxc4yeuv1U2BsSEEccn1tng-sLqu7?usp=drive_link). 
 
-To launch it, download the dataset and enter the corresponding folder. 
-By default, the required input is full signals matrix and the annotation of cells to distinguish tumor and normal.   
+To launch it, download the dataset and enter the corresponding folder path as mainDir variable. 
+By default, the required input are 
+1) full signals matrix 
+2) annotation of cells to distinguish tumor and normal.   
+
 The path to input (raw signals matrix and cells annotation) should be prepared via the following code: 
 
 ```
@@ -26,7 +29,7 @@ sId="MB183_ATAC_sub"
 sAnn = paste0(mainDir, "MB183_ATAC.CNV_blocks_ann.subsample_filtered.txt" )
 ```
 
-Afterwards, the name of the result should be stated and the input data prepared for CNV calling. 
+Afterwards, the name of the result should be stated and the input data formatted for CNV calling. 
 Corresponding function processes input data, outputs it formatted to infercnv and also creates custom configuration.
 It has a set of various options including for example meta-cells activation or usage of prepared reference control. 
 
