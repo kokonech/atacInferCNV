@@ -1,5 +1,9 @@
 The R package focuses on the copy number variance profiling of the scATAC-seq data from 10X protocols ATAC and snMultiomics. 
 It is based on the usage of InferCNV tool after initial custom processing of input data. 
+This approach was applied also in our [study](https://www.biorxiv.org/content/10.1101/2024.02.09.579690v1.full). 
+
+For questions/comments: please create a github issue or contact the author directly.  
+
 
 ## Installation ##
 
