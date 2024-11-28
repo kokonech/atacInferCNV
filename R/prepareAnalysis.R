@@ -39,6 +39,7 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn) {
     dev.off()
   }
 
+
   print("Normalization...")
 
   mb <- RunTFIDF(mb)
@@ -99,11 +100,12 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' Prepare analysis for the CNV calling from ATAC data
 #'
 #' @param dataPath Path to the input data in 10X format
-#' @param annData Path to annotation of the cells
+#' @param annData Path to annotation of the cells. Should have column
 #' @param resDir Path to the result directory
-#' @param sId Result name
+#' @param sId Result name. Default: "Sample"
+#' @param targColumn Name of the target column in annotation. Default: "CellType"
 #' @param ctrlGrp Name for the reference control cell type. Default: "Normal"
-#' @param meta TRUE if use meta cells, default FALSE
+#' @param meta Set TRUE to use meta cells, default FALSE
 #'
 #' @return NULL
 #' @export
@@ -111,7 +113,7 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 prepareAtacInferCnvInput <- function(dataPath,
                                      annPath,
                                      resDir, sId = "sample",
-                                     targColumn = "seurat_clusters",
+                                     targColumn = "CellType",
                                      ctrlGrp = "Normal",
                                      metaCells = FALSE) {
 
@@ -130,22 +132,16 @@ prepareAtacInferCnvInput <- function(dataPath,
   if (!(file.exists(fragpath))) {
     stop("Input fragments loci is not found:",countsPath)
   }
-  annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
-  seqlevels(annotation) <- paste0('chr', seqlevels(annotation))
+  #annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
+  #seqlevels(annotation) <- paste0('chr', seqlevels(annotation))
 
   # create ATAC assay and add it to the object
   chrom_assay  <- CreateChromatinAssay(
     counts = counts$Peaks,
     sep = c(":", "-"),
-    fragments = fragpath,
-    annotation = annotation
+    fragments = fragpath
   )
 
-  mb <- CreateSeuratObject(
-    counts = chrom_assay,
-    assay = "ATAC",
-    project = sId
-  )
 
   resDir = paste0(resDir,"/") # make sure subfolder usage
   if (!(dir.exists(resDir))) {

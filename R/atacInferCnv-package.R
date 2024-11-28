@@ -3,7 +3,6 @@
 #' @import ggplot2
 #' @import Seurat
 #' @import Signac
-#' @import EnsDb.Hsapiens.v86
 #' @import GenomicRanges
 #' @import infercnv
 #' @import stringr
