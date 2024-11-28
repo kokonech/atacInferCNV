@@ -142,6 +142,11 @@ prepareAtacInferCnvInput <- function(dataPath,
     fragments = fragpath
   )
 
+  mb <- CreateSeuratObject(
+    counts = chrom_assay,
+    assay = "ATAC",
+    project = sId
+  )
 
   resDir = paste0(resDir,"/") # make sure subfolder usage
   if (!(dir.exists(resDir))) {
