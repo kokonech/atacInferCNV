@@ -50,7 +50,7 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
     #print(ctrlObj)
     #print(ctrlObj@assays$ATAC@ranges)
     #print(mb@assays$ATAC@ranges)
-    # NOTE : not most optimal merging - regions of mb used as a reference
+    # NOTE : not most optimal merging - regions of x are used as main
     mb.merged <- merge(mb, y=ctrlObj)
     mb.merged@meta.data[ , targColumn] <- c(mb@meta.data[,targColumn],
                                             rep("ExtControl",ncol(ctrlObj)) )
@@ -185,17 +185,17 @@ prepareAtacInferCnvInput <- function(dataPath,
   } else {
     print(paste("Using target annotation column:",targColumn))
     #print(class(annData[, targColumn]))
-    annInfo = summary(as.factor(annData[, targColumn]))
-    print(annInfo)
-    print(ctrlObj)
-    if (! (ctrlGrp %in% names(annInfo)) ) {
-        stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
-    }
-    if (!is.null(ctrlObj)) {
+    if (is.null(ctrlObj)) {
+      annInfo = summary(as.factor(annData[, targColumn]))
+      print(annInfo)
+      if (! (ctrlGrp %in% names(annInfo)) ) {
+          stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+      }
+    } else {
       if (!inherits(ctrlObj, "Seurat")) {
         stop(paste0("Non-tumor external control input is not Seurat object!"))
       }
-      print("Using external control:")
+      print("Using external control (assigned as ExtControl):")
       print(ctrlObj)
       ctrlGrp = "ExtControl"
     }
