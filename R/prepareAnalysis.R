@@ -1,7 +1,7 @@
 
 
 
-prepareAnalysis <- function(mb, resDir, sId, annData, targColumn) {
+prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
   if (!is.null(annData)) {
     cIds = intersect(rownames(annData), rownames(mb@meta.data))
     if (length(cIds) == 0) {
@@ -37,6 +37,24 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn) {
     pdf(paste0(resDir, sId,"_VlnPlot_QC.after_filter.pdf"), width=8, height=6)
     VlnPlot(mb, features = c("nCount_ATAC", "TSS.enrichment", "nucleosome_signal"),     pt.size=0)
     dev.off()
+  }
+
+  if (!is.null(ctrlObj)) {
+    print("Merge with external control object")
+    # adjusted number of control cells should no go over 33% of number of tumor cells
+    expNumCtrlCells <- round( 0.33 * ncol(mb))
+    if (ncol(ctrlObj) > expNumCtrlCells) {
+      print(paste("Adjust external control, decrease num cells to",expNumCtrlCells))
+      ctrlObj <- ctrlObj[ , 1:expNumCtrlCells]
+    }
+    #print(ctrlObj)
+    #print(ctrlObj@assays$ATAC@ranges)
+    #print(mb@assays$ATAC@ranges)
+    # NOTE : not most optimal merging - regions of mb used as a reference
+    mb.merged <- merge(mb, y=ctrlObj)
+    mb.merged@meta.data[ , targColumn] <- c(mb@meta.data[,targColumn],
+                                            rep("ExtControl",ncol(ctrlObj)) )
+    mb <- mb.merged
   }
 
 
@@ -105,6 +123,7 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' @param sId Result name. Default: "Sample"
 #' @param targColumn Name of the target column in annotation. Default: "CellType"
 #' @param ctrlGrp Name for the reference control cell type. Default: "Normal"
+#' @param ctrlObj Seurat/Signac object to use as non-tumor control. Default: NULL
 #' @param meta Set TRUE to use meta cells, default FALSE
 #'
 #' @return NULL
@@ -115,6 +134,7 @@ prepareAtacInferCnvInput <- function(dataPath,
                                      resDir, sId = "sample",
                                      targColumn = "CellType",
                                      ctrlGrp = "Normal",
+                                     ctrlObj = NULL,
                                      metaCells = FALSE) {
 
   print("Loading input...")
@@ -164,17 +184,26 @@ prepareAtacInferCnvInput <- function(dataPath,
     stop(paste("Required annotation column is not available:", targColumn))
   } else {
     print(paste("Using target annotation column:",targColumn))
-    print(class(annData[, targColumn]))
+    #print(class(annData[, targColumn]))
     annInfo = summary(as.factor(annData[, targColumn]))
     print(annInfo)
+    print(ctrlObj)
     if (! (ctrlGrp %in% names(annInfo)) ) {
         stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+    }
+    if (!is.null(ctrlObj)) {
+      if (!inherits(ctrlObj, "Seurat")) {
+        stop(paste0("Non-tumor external control input is not Seurat object!"))
+      }
+      print("Using external control:")
+      print(ctrlObj)
+      ctrlGrp = "ExtControl"
     }
 
   }
 
   print("Prepare input data...")
-  mb <- prepareAnalysis(mb, resDir, sId, annData, targColumn)
+  mb <- prepareAnalysis(mb, resDir, sId, annData, targColumn, ctrlObj)
 
 
   print("Save signal...")

@@ -9,7 +9,7 @@ runAtacInferCnv(resDir, configFile = "infercnv_config.yml")
 \arguments{
 \item{resDir}{Path to the result directory with input}
 
-\item{configFile}{Name ofconfiguration file with InferCnv params}
+\item{configFile}{Name of configuration file with InferCnv params}
 }
 \description{
 Run InferCNV calling using generated input config

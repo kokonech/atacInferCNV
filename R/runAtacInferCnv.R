@@ -1,12 +1,14 @@
 #' Run InferCNV calling using generated input config
 #'
 #' @param resDir Path to the result directory with input
-#' @param configFile Name ofconfiguration file with InferCnv params
+#' @param configFile Name of configuration file with InferCnv params
 #' @return NULL
 #' @export
 #'
 runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml") {
-
+  # Ensure the working directory is restored when the function exits
+  originalDir <- getwd()
+  on.exit(setwd(originalDir))
   setwd(resDir)
 
   print(paste("Loading InferCNV configuration from:",configFile))
@@ -50,15 +52,17 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml") {
                                cutoff=cfg$cutOff,
                                out_dir=cfg$resName,
                                cluster_by_groups=groupUsage,
-                               cluster_references = FALSE,
                                k_obs_groups =  numClusters,
-                               smooth_method="runmeans",
                                # analysis_mode="subclusters", # verification
                                output_format = "pdf", # issue with atac
+                               # futher already custom params to play with
+                               no_plot = F,
                                denoise=T,
                                plot_steps=F,
                                HMM=F,
-                               no_plot = F
+                               cluster_references = FALSE,
+                               smooth_method="runmeans"
+
   )
 
 }
