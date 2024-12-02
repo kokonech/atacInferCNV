@@ -1,11 +1,21 @@
-#' Run InferCNV calling using generated input config
+#' Wrapper function to run InferCNV calling using generated input data
 #'
 #' @param resDir Path to the result directory with input
-#' @param configFile Name of configuration file with InferCnv params
+#' @param configFile Name of configuration file with InferCnv input data
+#' @param numClusters Number of clusters for hier. clustering. If equals one then no clustering performed.
+#' @param chrToExclude Chromosomes to exclude. Default: Y,MT
+#' @param addDenoise Activate denoise (InferCNV param). Deafult: TRUE
+#' @param clusterRefs Cluster also referecne (InferCNV param). Default: FALSE
+#' @param smoothMethod Method for smoothing (InferCNV param). Default: runmeans
+#' @param ... Other parameters to provide for infercnv::run, more details in documentation of this function
 #' @return NULL
 #' @export
 #'
-runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml") {
+runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
+                            numClusters = 3, chrToExclude = c("Y","MT"),
+                            addDenoise = TRUE, clusterRefs = FALSE,
+                            smoothMethod = "runmeans",
+                            ...) {
   # Ensure the working directory is restored when the function exits
   originalDir <- getwd()
   on.exit(setwd(originalDir))
@@ -20,12 +30,7 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml") {
   print(paste("Normal clusters:",cfg$refGroup))
   print(paste("Cut off:",cfg$cutOff))
 
-  numClusters <- 1
-  groupUsage <- TRUE
-  if (!is.null(cfg$numClusters)) {
-    numClusters <- cfg$numClusters
-    groupUsage <- FALSE
-  }
+  groupUsage <- ifelse(numClusters > 1,FALSE,TRUE)
   print(paste("Num tumor clusters:",numClusters))
 
   refGroups <- str_split(cfg$refGroups,",")[[1]]
@@ -40,8 +45,7 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml") {
                                       delim="\t",
                                       gene_order_file=geneOrderRef,
                                       ref_group_names=refGroups,
-                                      chr_exclude=c("Y","MT") # default
-                                      #chr_exclude=c("MT")
+                                      chr_exclude=chrToExclude
   )
 
   # this is required to allow plots, otherwise there is a fail in plotting
@@ -53,15 +57,12 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml") {
                                out_dir=cfg$resName,
                                cluster_by_groups=groupUsage,
                                k_obs_groups =  numClusters,
-                               # analysis_mode="subclusters", # verification
                                output_format = "pdf", # issue with atac
-                               # futher already custom params to play with
-                               no_plot = F,
-                               denoise=T,
-                               plot_steps=F,
-                               HMM=F,
-                               cluster_references = FALSE,
-                               smooth_method="runmeans"
+                               # further already custom params to play with
+                               denoise=addDenoise,
+                               cluster_references = clusterRefs,
+                               smooth_method=smoothMethod,
+                               ...
 
   )
 
