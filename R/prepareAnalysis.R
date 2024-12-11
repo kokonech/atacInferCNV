@@ -124,6 +124,9 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' @param targColumn Name of the target column in annotation. Default: "CellType"
 #' @param ctrlGrp Name for the reference control cell type. Default: "Normal"
 #' @param ctrlObj Seurat/Signac object to use as non-tumor control. Default: NULL
+#' @param binSize Apply custom bin size to combine signals in windows for CNV calling
+#' e.g. 500000 for 500 KBp. Default: NULL (not use this option)
+#' @param chromLength Numeric vector of chromosome sizes, specific for genome. Default: NULL
 #' @param meta Set TRUE to use meta cells, default FALSE
 #'
 #' @return NULL
@@ -133,8 +136,8 @@ prepareAtacInferCnvInput <- function(dataPath,
                                      annPath,
                                      resDir, sId = "sample",
                                      targColumn = "CellType",
-                                     ctrlGrp = "Normal",
-                                     ctrlObj = NULL,
+                                     ctrlGrp = "Normal", ctrlObj = NULL,
+                                     binSize = NULL, chromLength = NULL,
                                      metaCells = FALSE) {
 
   print("Loading input...")
@@ -202,22 +205,30 @@ prepareAtacInferCnvInput <- function(dataPath,
 
   }
 
+  if (!is.null(binSize)) {
+    if (is.null(chromLength)) {
+      stop("The chromosomes length vector is not provided for the bin size adjustment!")
+    }
+  }
+
   print("Prepare input data...")
   mb <- prepareAnalysis(mb, resDir, sId, annData, targColumn, ctrlObj)
 
-
   print("Save signal...")
   saveCnvInput(mb, resDir, sId, targColumn)
-
+  if (!is.null(binSize)) {
+    print(paste("Re-format input signal matrix for bins of size", binSize))
+    mb <- aggregateBins(mb, resDir, sId, binSize, chromLength)
+  }
+  print(head(mb@meta.data))
   if (metaCells) {
     print("Forming meta-cells...")
-    mb$seurat_clusters <- as.factor(mb@meta.data[, targColumn])
-    print(summary(mb$seurat_clusters))
-    extractMetacells(resDir, sId, mb)
+    print(targColumn)
+    extractMetacells(resDir, sId, mb, targColumn)
   }
 
   print("Write configuration...")
-  writeConfig(resDir, sId, ctrlGrp, metaCells)
+  writeConfig(resDir, sId, ctrlGrp, binSize, metaCells)
   print("Prepared input")
 
 }

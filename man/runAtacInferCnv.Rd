@@ -2,7 +2,7 @@
 % Please edit documentation in R/runAtacInferCnv.R
 \name{runAtacInferCnv}
 \alias{runAtacInferCnv}
-\title{Run InferCNV calling using generated input config}
+\title{Wrapper function to run InferCNV calling using generated input data}
 \usage{
 runAtacInferCnv(
   resDir,
@@ -33,5 +33,5 @@ runAtacInferCnv(
 \item{...}{Other parameters to provide for infercnv::run, more details in documentation of this function}
 }
 \description{
-Run InferCNV calling using generated input config
+Wrapper function to run InferCNV calling using generated input data
 }

@@ -6,5 +6,7 @@
 #' @import GenomicRanges
 #' @import infercnv
 #' @import stringr
+#' @useDynLib atacInferCnv, .registration=TRUE
+#' @importFrom Rcpp sourceCpp
 NULL
 #> NULL

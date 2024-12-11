@@ -3,15 +3,25 @@
 #' @param resDir Path to the result directory
 #' @param sId Result name
 #' @param sample Input Seurat object to split
+#' @param targColumn Name of annotation column to split
 #' @param metacell_content Amount of cells for adjustment, default n=5
 #'
 #' @return NULL
 #' @export
 #'
-extractMetacells <- function(resDir, sId, sample, metacell_content = 5) {
+extractMetacells <- function(resDir, sId, sample, targColumn, metacell_content = 5) {
+
+  # Checking list:
+  #Seurat::Idents(sample) <- sample$cluster_names
+  print(paste("Number of cells for meta-cell formation:",metacell_content))
+  print(targColumn)
+  targAnn <- factor(sample[[targColumn,drop=T]])
+  print(targAnn)
+  rawCounts <- sample@assays$ATAC@counts
+  print(dim(rawCounts))
 
   # Will store all the metacells. The test column will be removed at the end.
-  whole_metacells <- data.frame(test = rownames(sample), row.names = rownames(sample))
+  whole_metacells <- data.frame(test = rownames(rawCounts), row.names = rownames(rawCounts))
 
 
   # Will store the complete annotation for the metacells.
@@ -21,23 +31,20 @@ extractMetacells <- function(resDir, sId, sample, metacell_content = 5) {
   # Generate a new metadata column storing the mapping cell-metacell.
   sample[["metacell_mapping"]] <- "not_mapped"
 
-  # Here my sample has already been labelled, so the cluster labels are actually in the 'cluster_names' column. Use 'seurat_clusters' instead if not labelled.
 
-  # Checking list:
-  #Seurat::Idents(sample) <- sample$cluster_names
-  print(paste("Number of cells for meta-cell formation:",metacell_content))
   # for restored object
-  for (cluster_id in levels(sample$seurat_clusters)){
+  for (cluster_id in levels(targAnn)){
     # custom version
     #for (cluster_id in levels(sample$)){
     print(paste("Computing metacells for cluster", cluster_id))
     # Will store the metacells per cluster.
-    metacells <- data.frame(test = rownames(sample), row.names = rownames(sample))
+    metacells <- data.frame(test = rownames(rawCounts), row.names = rownames(rawCounts))
     #chunksample <- sample[, sample$cluster_names == cluster_id]
     # Subset the sample by each cluster ID.
-    chunksample <- sample[, sample$seurat_clusters  == cluster_id]
+    #chunksample <- sample[, targAnn  == cluster_id]
     # Get the count data as a data frame and transpose it so columns are GENES and rows are CELLS.
-    countdata <- t(as.data.frame(Seurat::GetAssayData(chunksample, slot = "counts")))
+    #countdata <- t(as.data.frame(Seurat::GetAssayData(chunksample, slot = "counts")))
+    countdata <- t(as.data.frame(rawCounts[ ,targAnn  == cluster_id]))
     #print(head(countdata))
     # Get the possible amount of metacells.
     times <- trunc(dim(countdata)[1] / metacell_content)

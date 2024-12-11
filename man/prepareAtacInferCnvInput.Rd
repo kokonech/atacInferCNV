@@ -12,6 +12,8 @@ prepareAtacInferCnvInput(
   targColumn = "CellType",
   ctrlGrp = "Normal",
   ctrlObj = NULL,
+  binSize = NULL,
+  chromLength = NULL,
   metaCells = FALSE
 )
 }
@@ -27,6 +29,11 @@ prepareAtacInferCnvInput(
 \item{ctrlGrp}{Name for the reference control cell type. Default: "Normal"}
 
 \item{ctrlObj}{Seurat/Signac object to use as non-tumor control. Default: NULL}
+
+\item{binSize}{Apply custom bin size to combine signals in windows for CNV calling
+e.g. 500000 for 500 KBp. Default: NULL (not use this option)}
+
+\item{chromLength}{Numeric vector of chromosome sizes, specific for genome. Default: NULL}
 
 \item{annData}{Path to annotation of the cells. Should have column}
 

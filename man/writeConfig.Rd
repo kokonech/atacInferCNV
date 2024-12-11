@@ -4,7 +4,7 @@
 \alias{writeConfig}
 \title{Write InferCNV configuration}
 \usage{
-writeConfig(resDir, sId, ctrlGrp = "Normal", meta = F)
+writeConfig(resDir, sId, ctrlGrp = "Normal", binSize = NULL, meta = F)
 }
 \arguments{
 \item{resDir}{Result directory path}
@@ -12,6 +12,8 @@ writeConfig(resDir, sId, ctrlGrp = "Normal", meta = F)
 \item{sId}{Result name}
 
 \item{ctrlGrp}{Name for the reference control cell type}
+
+\item{binSize}{Size of the bin e.g. 100000 for 100Kbp}
 
 \item{meta}{True if use meta cells, default false}
 }

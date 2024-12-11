@@ -9,5 +9,16 @@ License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.0),utils
-Imports: infercnv (>= 1.3.1),Signac,Seurat,GenomicRanges,config,stringr,ggplot2 
+Imports: 
+    infercnv (>= 1.3.1),
+    Signac,
+    Seurat,
+    GenomicRanges,
+    config,
+    stringr,
+    ggplot2,
+    Rcpp,
+    RcppEigen
 RoxygenNote: 7.2.3
+LinkingTo: 
+    Rcpp,RcppEigen
