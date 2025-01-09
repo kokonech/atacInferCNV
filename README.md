@@ -30,7 +30,7 @@ The path to input (raw signals matrix and cells annotation) should be prepared v
 mainDir = "/path/to/test/data"
 inDir = paste0(mainDir, "/MB183_ATAC_data")
 sId = "MB183_ATAC_sub"
-sAnn = paste0(mainDir, "/MB183_ATAC.CNV_blocks_ann.subsample_filtered.txt" )
+sAnn = paste0(mainDir, "/MB183_ATAC.CNV_blocks_annotation.txt" )
 ```
 
 Afterwards, the name of the result should be stated and the input data formatted for CNV calling. 
