@@ -28,9 +28,9 @@ The path to input (raw signals matrix and cells annotation) should be prepared v
 
 ```
 mainDir = "/path/to/test/data"
-inDir = paste0(mainDir, "MB183_ATAC_data")
-sId="MB183_ATAC_sub"
-sAnn = paste0(mainDir, "MB183_ATAC.CNV_blocks_ann.subsample_filtered.txt" )
+inDir = paste0(mainDir, "/MB183_ATAC_data")
+sId = "MB183_ATAC_sub"
+sAnn = paste0(mainDir, "/MB183_ATAC.CNV_blocks_ann.subsample_filtered.txt" )
 ```
 
 Afterwards, the name of the result should be stated and the input data formatted for CNV calling. 
@@ -38,7 +38,7 @@ Corresponding function processes input data, outputs it formatted to infercnv an
 It has a set of various options including for example meta-cells activation or usage of external reference control. 
 
 ```
-resPath=paste0(mainDir,sId,"_result")
+resPath=paste0(mainDir,"/",sId,"_result")
 prepareAtacInferCnvInput(inDir,sAnn,resPath,targColumn = "cnvBlock")
 ```
 
