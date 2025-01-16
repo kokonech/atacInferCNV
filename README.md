@@ -49,7 +49,7 @@ runAtacInferCnv(resPath)
 
 ```
 
-
+Detailed documentation is located [here](https://github.com/kokonech/atacInferCnv/wiki).
 
 
 
