@@ -14,11 +14,11 @@ extractMetacells <- function(resDir, sId, sample, targColumn, metacell_content =
   # Checking list:
   #Seurat::Idents(sample) <- sample$cluster_names
   print(paste("Number of cells for meta-cell formation:",metacell_content))
-  print(targColumn)
+  #print(targColumn)
   targAnn <- factor(sample[[targColumn,drop=T]])
-  print(targAnn)
+  #print(targAnn)
   rawCounts <- sample@assays$ATAC@counts
-  print(dim(rawCounts))
+  #print(dim(rawCounts))
 
   # Will store all the metacells. The test column will be removed at the end.
   whole_metacells <- data.frame(test = rownames(rawCounts), row.names = rownames(rawCounts))

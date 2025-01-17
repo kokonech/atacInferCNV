@@ -16,6 +16,11 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
                             addDenoise = TRUE, clusterRefs = FALSE,
                             smoothMethod = "runmeans",
                             ...) {
+
+  if (!(dir.exists(resDir))) {
+    stop("The result directory with InferCNV input does not exist:",resDir)
+  }
+
   # Ensure the working directory is restored when the function exits
   originalDir <- getwd()
   on.exit(setwd(originalDir))

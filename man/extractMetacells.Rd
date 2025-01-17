@@ -4,7 +4,7 @@
 \alias{extractMetacells}
 \title{Compute meta-cells out of the main}
 \usage{
-extractMetacells(resDir, sId, sample, metacell_content = 5)
+extractMetacells(resDir, sId, sample, targColumn, metacell_content = 5)
 }
 \arguments{
 \item{resDir}{Path to the result directory}
@@ -12,6 +12,8 @@ extractMetacells(resDir, sId, sample, metacell_content = 5)
 \item{sId}{Result name}
 
 \item{sample}{Input Seurat object to split}
+
+\item{targColumn}{Name of annotation column to split}
 
 \item{metacell_content}{Amount of cells for adjustment, default n=5}
 }

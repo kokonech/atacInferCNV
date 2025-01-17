@@ -5,9 +5,10 @@
 \title{Prepare analysis for the CNV calling from ATAC data}
 \usage{
 prepareAtacInferCnvInput(
-  dataPath,
-  annPath,
-  resDir,
+  dataPath = "",
+  annPath = "",
+  resDir = "",
+  inObj = NULL,
   sId = "sample",
   targColumn = "CellType",
   ctrlGrp = "Normal",
@@ -20,7 +21,11 @@ prepareAtacInferCnvInput(
 \arguments{
 \item{dataPath}{Path to the input data in 10X format}
 
+\item{annPath}{Path to annotation of the cells in the target column}
+
 \item{resDir}{Path to the result directory}
+
+\item{inObj}{Precomputed Seurat/Signac object with required input data}
 
 \item{sId}{Result name. Default: "Sample"}
 
@@ -34,8 +39,6 @@ prepareAtacInferCnvInput(
 e.g. 500000 for 500 KBp. Default: NULL (not use this option)}
 
 \item{chromLength}{Numeric vector of chromosome sizes, specific for genome. Default: NULL}
-
-\item{annData}{Path to annotation of the cells. Should have column}
 
 \item{meta}{Set TRUE to use meta cells, default FALSE}
 }

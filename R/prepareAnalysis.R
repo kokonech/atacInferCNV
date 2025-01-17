@@ -79,12 +79,13 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
   }
   dev.off()
 
+  saveRDS(mb, paste0(resDir,sId,"_obj.RDS" ))
+
   mb
 }
 
 
 saveCnvInput <- function(mb,resDir, sId, targColumn) {
-  saveRDS(mb, paste0(resDir,sId,"_obj.RDS" ))
 
   # for InferCNV
 
@@ -118,8 +119,9 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' Prepare analysis for the CNV calling from ATAC data
 #'
 #' @param dataPath Path to the input data in 10X format
-#' @param annData Path to annotation of the cells. Should have column
+#' @param annPath Path to annotation of the cells in the target column
 #' @param resDir Path to the result directory
+#' @param inObj Precomputed Seurat/Signac object with required input data
 #' @param sId Result name. Default: "Sample"
 #' @param targColumn Name of the target column in annotation. Default: "CellType"
 #' @param ctrlGrp Name for the reference control cell type. Default: "Normal"
@@ -132,44 +134,95 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' @return NULL
 #' @export
 #'
-prepareAtacInferCnvInput <- function(dataPath,
-                                     annPath,
-                                     resDir, sId = "sample",
+prepareAtacInferCnvInput <- function(dataPath = "",
+                                     annPath = "",
+                                     resDir = "", inObj = NULL, sId = "sample",
                                      targColumn = "CellType",
                                      ctrlGrp = "Normal", ctrlObj = NULL,
                                      binSize = NULL, chromLength = NULL,
                                      metaCells = FALSE) {
 
   print("Loading input...")
-  if (!(file.exists(dataPath))) {
-    stop("Input data folder is not found:",dataPath)
-
+  if (nchar(resDir) == 0) {
+    stop("Path to result is not provided!")
   }
-  countsPath = paste0(dataPath,"/filtered_feature_bc_matrix.h5")
-  if (!(file.exists(countsPath))) {
-    stop("Input feature counts matrix is not found:",countsPath)
+  if (is.null(inObj)) {
+    if (!(file.exists(dataPath))) {
+      stop("Input data folder is not found:",dataPath)
+
+    }
+    countsPath = paste0(dataPath,"/filtered_feature_bc_matrix.h5")
+    if (!(file.exists(countsPath))) {
+      stop("Input feature counts matrix is not found:",countsPath)
+    }
+    counts <- Read10X_h5(countsPath)
+
+    fragpath = paste0(dataPath, "/atac_fragments.tsv.gz")
+    if (!(file.exists(fragpath))) {
+      stop("Input fragments loci is not found:",countsPath)
+    }
+    #annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
+    #seqlevels(annotation) <- paste0('chr', seqlevels(annotation))
+
+    # create ATAC assay and add it to the object
+    chrom_assay  <- CreateChromatinAssay(
+      counts = counts$Peaks,
+      sep = c(":", "-"),
+      fragments = fragpath
+    )
+
+    mb <- CreateSeuratObject(
+      counts = chrom_assay,
+      assay = "ATAC",
+      project = sId
+    )
+
+    if (!(file.exists(annPath))) {
+      stop(paste("Annotation file is not found:",annPath))
+
+    }
+    annData <- read.delim(annPath)
+
+    if (! (targColumn %in% colnames(annData) ) ) {
+      stop(paste("Required annotation column is not available:", targColumn))
+    } else {
+      print(paste("Using target annotation column:",targColumn))
+      #print(class(annData[, targColumn]))
+      if (is.null(ctrlObj)) {
+        annInfo = summary(as.factor(annData[, targColumn]))
+        print(annInfo)
+        if (! (ctrlGrp %in% names(annInfo)) ) {
+          stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+        }
+      } else {
+        if (!inherits(ctrlObj, "Seurat")) {
+          stop(paste0("Non-tumor external control input is not Seurat object!"))
+        }
+        print("Using external control (assigned as ExtControl):")
+        print(ctrlObj)
+        ctrlGrp = "ExtControl"
+      }
+
+    }
+  } else {
+      print("Using existing Signac/Seurat object")
+      if (!inherits(inObj, "Seurat")) {
+        stop(paste0("Pre-computed input object is not Seurat object!"))
+      }
+      if (!is.null(ctrlObj)) {
+        stop(paste0("Usage of external reference is not supported if pre-computed object is provided."))
+      }
+      mb <- inObj
+      annData <- inObj@meta.data
+      if (! (targColumn %in% colnames(annData) ) ) {
+        stop(paste("Required annotation column is not available in pre-computed input object:", targColumn))
+      }
+      annInfo = summary(as.factor(annData[, targColumn]))
+      print(annInfo)
+      if (! (ctrlGrp %in% names(annInfo)) ) {
+        stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+      }
   }
-  counts <- Read10X_h5(countsPath)
-
-  fragpath = paste0(dataPath, "/atac_fragments.tsv.gz")
-  if (!(file.exists(fragpath))) {
-    stop("Input fragments loci is not found:",countsPath)
-  }
-  #annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
-  #seqlevels(annotation) <- paste0('chr', seqlevels(annotation))
-
-  # create ATAC assay and add it to the object
-  chrom_assay  <- CreateChromatinAssay(
-    counts = counts$Peaks,
-    sep = c(":", "-"),
-    fragments = fragpath
-  )
-
-  mb <- CreateSeuratObject(
-    counts = chrom_assay,
-    assay = "ATAC",
-    project = sId
-  )
 
   resDir = paste0(resDir,"/") # make sure subfolder usage
   if (!(dir.exists(resDir))) {
@@ -177,33 +230,6 @@ prepareAtacInferCnvInput <- function(dataPath,
     dir.create(resDir)
   }
 
-   if (!(file.exists(annPath))) {
-    stop(paste("Annotation file is not found:",annPath))
-
-  }
-  annData <- read.delim(annPath)
-
-  if (! (targColumn %in% colnames(annData) ) ) {
-    stop(paste("Required annotation column is not available:", targColumn))
-  } else {
-    print(paste("Using target annotation column:",targColumn))
-    #print(class(annData[, targColumn]))
-    if (is.null(ctrlObj)) {
-      annInfo = summary(as.factor(annData[, targColumn]))
-      print(annInfo)
-      if (! (ctrlGrp %in% names(annInfo)) ) {
-          stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
-      }
-    } else {
-      if (!inherits(ctrlObj, "Seurat")) {
-        stop(paste0("Non-tumor external control input is not Seurat object!"))
-      }
-      print("Using external control (assigned as ExtControl):")
-      print(ctrlObj)
-      ctrlGrp = "ExtControl"
-    }
-
-  }
 
   if (!is.null(binSize)) {
     if (is.null(chromLength)) {
@@ -211,8 +237,10 @@ prepareAtacInferCnvInput <- function(dataPath,
     }
   }
 
-  print("Prepare input data...")
-  mb <- prepareAnalysis(mb, resDir, sId, annData, targColumn, ctrlObj)
+  if (is.null(inObj)) {
+    print("Prepare input data...")
+    mb <- prepareAnalysis(mb, resDir, sId, annData, targColumn, ctrlObj)
+  }
 
   print("Save signal...")
   saveCnvInput(mb, resDir, sId, targColumn)
@@ -220,7 +248,7 @@ prepareAtacInferCnvInput <- function(dataPath,
     print(paste("Re-format input signal matrix for bins of size", binSize))
     mb <- aggregateBins(mb, resDir, sId, binSize, chromLength)
   }
-  print(head(mb@meta.data))
+  #print(head(mb@meta.data))
   if (metaCells) {
     print("Forming meta-cells...")
     print(targColumn)
