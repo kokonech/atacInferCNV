@@ -92,9 +92,9 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
   annTable <- mb@meta.data
   annTable2 <- annTable[,targColumn,drop=F]
 
-  if (targColumn == "seurat_clusters" ) {
-      annTable2$seurat_clusters <- paste0("cl",annTable2$seurat_clusters)
-  }
+  #if (targColumn == "seurat_clusters" ) {
+  #    annTable2$seurat_clusters <- paste0("cl",annTable2$seurat_clusters)
+  #}
   write.table(annTable2, paste0(resDir,sId,"_cnv_ann.txt") ,col.names = F,sep="\t",quote=F)
 
   gz1 <- gzfile(paste0(resDir,sId,"_raw_counts.txt.gz"), "w")
