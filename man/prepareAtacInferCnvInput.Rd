@@ -31,7 +31,7 @@ prepareAtacInferCnvInput(
 
 \item{targColumn}{Name of the target column in annotation. Default: "CellType"}
 
-\item{ctrlGrp}{Name for the reference control cell type. Default: "Normal"}
+\item{ctrlGrp}{Name for the reference control cell type. Could be several names, separated by comma. Default: "Normal"}
 
 \item{ctrlObj}{Seurat/Signac object to use as non-tumor control. Default: NULL}
 

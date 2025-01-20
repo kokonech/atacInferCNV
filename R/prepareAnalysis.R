@@ -124,7 +124,7 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' @param inObj Precomputed Seurat/Signac object with required input data
 #' @param sId Result name. Default: "Sample"
 #' @param targColumn Name of the target column in annotation. Default: "CellType"
-#' @param ctrlGrp Name for the reference control cell type. Default: "Normal"
+#' @param ctrlGrp Name for the reference control cell type. Could be several names, separated by comma. Default: "Normal"
 #' @param ctrlObj Seurat/Signac object to use as non-tumor control. Default: NULL
 #' @param binSize Apply custom bin size to combine signals in windows for CNV calling
 #' e.g. 500000 for 500 KBp. Default: NULL (not use this option)
@@ -191,7 +191,8 @@ prepareAtacInferCnvInput <- function(dataPath = "",
       if (is.null(ctrlObj)) {
         annInfo = summary(as.factor(annData[, targColumn]))
         print(annInfo)
-        if (! (ctrlGrp %in% names(annInfo)) ) {
+        ctrlStatus = as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
+        if (any(ctrlStatus == 0) ) {
           stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
         }
       } else {
@@ -219,7 +220,8 @@ prepareAtacInferCnvInput <- function(dataPath = "",
       }
       annInfo = summary(as.factor(annData[, targColumn]))
       print(annInfo)
-      if (! (ctrlGrp %in% names(annInfo)) ) {
+      ctrlStatus = as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
+      if (any(ctrlStatus == 0) ) {
         stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
       }
   }
