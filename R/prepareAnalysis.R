@@ -129,7 +129,7 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' @param binSize Apply custom bin size to combine signals in windows for CNV calling
 #' e.g. 500000 for 500 KBp. Default: NULL (not use this option)
 #' @param chromLength Numeric vector of chromosome sizes, specific for genome. Default: NULL
-#' @param meta Set TRUE to use meta cells, default FALSE
+#' @param metaCells Set TRUE to use meta cells, default FALSE
 #'
 #' @return NULL
 #' @export

@@ -1,5 +1,8 @@
-#' @importFrom utils write.csv read.delim write.table
+#' @importFrom utils write.csv read.delim write.table read.table
 #' @importFrom config get
+#' @importFrom stats cutree
+#' @import graphics
+#' @import grDevices
 #' @import ggplot2
 #' @import Seurat
 #' @import Signac
