@@ -2,17 +2,18 @@
 #'
 #' @param resDir Path to the result directory with input
 #' @param configFile Name of configuration file with InferCnv input data
-#' @param numClusters Number of clusters for hier. clustering. If equals one then no clustering performed.
+#' @param numClusters Number of clusters for hier. clustering. If equals one (by default)
+#' then no clustering is performed and provided annoitation used for the formation of CNV groups.
 #' @param chrToExclude Chromosomes to exclude. Default: Y,MT
 #' @param addDenoise Activate denoise (InferCNV param). Deafult: TRUE
-#' @param clusterRefs Cluster also referecne (InferCNV param). Default: FALSE
+#' @param clusterRefs Cluster also reference (InferCNV param). Default: FALSE
 #' @param smoothMethod Method for smoothing (InferCNV param). Default: runmeans
 #' @param ... Other parameters to provide for infercnv::run, more details in documentation of this function
 #' @return NULL
 #' @export
 #'
 runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
-                            numClusters = 3, chrToExclude = c("Y","MT"),
+                            numClusters = 1, chrToExclude = c("Y","MT"),
                             addDenoise = TRUE, clusterRefs = FALSE,
                             smoothMethod = "runmeans",
                             ...) {

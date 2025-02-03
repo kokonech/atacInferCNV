@@ -7,7 +7,7 @@
 runAtacInferCnv(
   resDir,
   configFile = "infercnv_config.yml",
-  numClusters = 3,
+  numClusters = 1,
   chrToExclude = c("Y", "MT"),
   addDenoise = TRUE,
   clusterRefs = FALSE,
@@ -20,13 +20,14 @@ runAtacInferCnv(
 
 \item{configFile}{Name of configuration file with InferCnv input data}
 
-\item{numClusters}{Number of clusters for hier. clustering. If equals one then no clustering performed.}
+\item{numClusters}{Number of clusters for hier. clustering. If equals one (by default)
+then no clustering is performed and provided annoitation used for the formation of CNV groups.}
 
 \item{chrToExclude}{Chromosomes to exclude. Default: Y,MT}
 
 \item{addDenoise}{Activate denoise (InferCNV param). Deafult: TRUE}
 
-\item{clusterRefs}{Cluster also referecne (InferCNV param). Default: FALSE}
+\item{clusterRefs}{Cluster also reference (InferCNV param). Default: FALSE}
 
 \item{smoothMethod}{Method for smoothing (InferCNV param). Default: runmeans}
 
