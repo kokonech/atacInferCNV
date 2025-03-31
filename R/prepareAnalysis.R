@@ -151,22 +151,35 @@ prepareAtacInferCnvInput <- function(dataPath = "",
       stop("Input data folder is not found:",dataPath)
 
     }
+    # scMulti-omics
     countsPath = paste0(dataPath,"/filtered_feature_bc_matrix.h5")
-    if (!(file.exists(countsPath))) {
-      stop("Input feature counts matrix is not found:",countsPath)
-    }
-    counts <- Read10X_h5(countsPath)
-
     fragpath = paste0(dataPath, "/atac_fragments.tsv.gz")
+    # scAtac
+    countsPath2 = paste0(dataPath,"/filtered_peak_bc_matrix.h5")
+    if (!(file.exists(countsPath))) {
+      if (file.exists(countsPath2)) {
+        print("10X scATAC format identified")
+        countsVals = Read10X_h5(countsPath2)
+        fragpath = paste0(dataPath, "/fragments.tsv.gz")
+      } else {
+        stop(paste("Input feature counts matrix is not found in path:",dataPath,
+           "Expected formats: filtered_feature_bc_matrix.h5 or filtered_peak_bc_matrix.h5"))
+      }
+    } else {
+      print("10X scMulti-omics format identified")
+      countsVals <- Read10X_h5(countsPath)$Peaks
+    }
+
+
     if (!(file.exists(fragpath))) {
-      stop("Input fragments loci is not found:",countsPath)
+      stop("Input fragments loci is not found:",fragpath)
     }
     #annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
     #seqlevels(annotation) <- paste0('chr', seqlevels(annotation))
 
     # create ATAC assay and add it to the object
     chrom_assay  <- CreateChromatinAssay(
-      counts = counts$Peaks,
+      counts = countsVals,
       sep = c(":", "-"),
       fragments = fragpath
     )
