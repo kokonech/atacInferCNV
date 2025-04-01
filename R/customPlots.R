@@ -49,7 +49,6 @@ plotCnvBlocks <- function( resDir) {
     blocks <- c("Full", unique(hcBlocksAdj))
   }
   resName = paste0(cnvDir,"/subclone_CNV_plot.pdf")
-  print(targ)
   pdf(resName, width = 14, height= 6)
 
   for (targ in blocks) {
