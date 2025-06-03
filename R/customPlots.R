@@ -16,7 +16,15 @@ plotCnvBlocks <- function( resDir) {
 
   print("Load InferCNV result...")
 
-  cnvMtx <- read.table(paste0(cnvDir,"/infercnv.observations.txt"),check.names = F)
+  obsFile = paste0(cnvDir,"/infercnv.observations.txt")
+  if (file.exists(obsFile)) {
+    cnvMtx <- read.table(obsFile,check.names = F)
+  } else {
+    warning("Output file infercnv.observations.txt does not exist in result folder, using expr matrix.\n
+         Update InferCnv version (>= 1.3.3 ) to support normalized output.")
+    cIds = unlist(infercnv_obj@observation_grouped_cell_indices)
+    cnvMtx <- infercnv_obj@expr.data[ ,cIds]
+  }
   gnMtx <- infercnv_obj@gene_order
 
   cMax = max(cnvMtx)
