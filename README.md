@@ -42,14 +42,14 @@ resPath=paste0(mainDir,"/",sId,"_result")
 prepareAtacInferCnvInput(inDir,sAnn,resPath,targColumn = "cnvBlock")
 ```
 
-Finally, the wrapper function to launch InferCnv is applied. It uses the generated configuration and outputs full result as additional subfolder:
+Finally, the wrapper function to launch InferCNV is applied. It uses the generated configuration and outputs full result as additional subfolder:
 ```
 # run InferCNV
 runAtacInferCnv(resPath)
 
 ```
 
-Detailed documentation is located [here](https://github.com/kokonech/atacInferCnv/wiki).
+Detailed documentation is located [here](https://github.com/kokonech/atacInferCNV/wiki).
 
 
 
