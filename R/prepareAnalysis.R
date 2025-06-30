@@ -129,7 +129,7 @@ saveCnvInput <- function(mb,resDir, sId, targColumn) {
 #' @param binSize Apply custom bin size to combine signals in windows for CNV calling
 #' e.g. 500000 for 500 KBp. Default: NULL (not use this option)
 #' @param chromLength Numeric vector of chromosome sizes, specific for genome. Default: NULL
-#' @param metaCells Set TRUE to use meta cells, default FALSE
+#' @param metaCells Set TRUE to use meta cells (n=5 cells will be used to merge) or assign a number of cells. Default: FALSE
 #'
 #' @return NULL
 #' @export
@@ -267,7 +267,14 @@ prepareAtacInferCnvInput <- function(dataPath = "",
   if (metaCells) {
     print("Forming meta-cells...")
     print(targColumn)
-    extractMetacells(resDir, sId, mb, targColumn)
+    if (is.numeric(metaCells)) {
+      print("Using custom meta-cell count...")
+      metaCount = metaCells
+    } else {
+      print("Using default meta-cell count...")
+      metaCount = 5
+    }
+    extractMetacells(resDir, sId, mb, targColumn, metacell_content = metaCount )
   }
 
   print("Write configuration...")

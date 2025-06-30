@@ -40,7 +40,7 @@ e.g. 500000 for 500 KBp. Default: NULL (not use this option)}
 
 \item{chromLength}{Numeric vector of chromosome sizes, specific for genome. Default: NULL}
 
-\item{metaCells}{Set TRUE to use meta cells, default FALSE}
+\item{metaCells}{Set TRUE to use meta cells (n=5 cells will be used to merge) or assign a number of cells. Default: FALSE}
 }
 \description{
 Prepare analysis for the CNV calling from ATAC data
