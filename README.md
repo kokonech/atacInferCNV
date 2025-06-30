@@ -13,6 +13,7 @@ Afterwards run command:
 ```
 library(devtools)
 install("path/to/the/source/code")
+library(atacInferCnv)
 ```
 
 ## How to run the analysis ##
@@ -21,7 +22,7 @@ The example input data is located [here](https://drive.google.com/drive/folders/
 
 To launch it, download the dataset and enter the corresponding folder path as mainDir variable. 
 By default, the required input are 
-1) full signals matrix 
+1) full signals matrix  
 2) annotation of cells to distinguish tumor and normal.   
 
 The path to input (raw signals matrix and cells annotation) should be prepared via the following code: 
@@ -49,7 +50,7 @@ runAtacInferCnv(resPath)
 
 ```
 
-Detailed documentation is located [here](https://github.com/kokonech/atacInferCNV/wiki).
+Detailed documentation and description of available options are located [here](https://github.com/kokonech/atacInferCNV/wiki).
 
 
 
