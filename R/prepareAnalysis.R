@@ -1,4 +1,23 @@
 
+mergeWithControlInitial <- function(mb, ctrlObj, targColumn) {
+  # adjusted number of control cells should no go over 33% of number of tumor cells
+  expNumCtrlCells <- round( 0.33 * ncol(mb))
+  if (ncol(ctrlObj) > expNumCtrlCells) {
+    print(paste("Adjust external control, decrease num cells to",expNumCtrlCells))
+    ctrlObj <- ctrlObj[ , 1:expNumCtrlCells]
+  }
+  #print(ctrlObj)
+  #print(ctrlObj@assays$ATAC@ranges)
+  #print(mb@assays$ATAC@ranges)
+  # NOTE : not most optimal merging - regions of x are used as main
+
+  mb.merged <- merge(mb, y=ctrlObj)
+
+  mb.merged@meta.data[ , targColumn] <- c(mb@meta.data[,targColumn],
+                                          rep("ExtControl",ncol(ctrlObj)) )
+  mb.merged
+
+}
 
 
 prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
@@ -41,20 +60,7 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
 
   if (!is.null(ctrlObj)) {
     print("Merge with external control object")
-    # adjusted number of control cells should no go over 33% of number of tumor cells
-    expNumCtrlCells <- round( 0.33 * ncol(mb))
-    if (ncol(ctrlObj) > expNumCtrlCells) {
-      print(paste("Adjust external control, decrease num cells to",expNumCtrlCells))
-      ctrlObj <- ctrlObj[ , 1:expNumCtrlCells]
-    }
-    #print(ctrlObj)
-    #print(ctrlObj@assays$ATAC@ranges)
-    #print(mb@assays$ATAC@ranges)
-    # NOTE : not most optimal merging - regions of x are used as main
-    mb.merged <- merge(mb, y=ctrlObj)
-    mb.merged@meta.data[ , targColumn] <- c(mb@meta.data[,targColumn],
-                                            rep("ExtControl",ncol(ctrlObj)) )
-    mb <- mb.merged
+    mb <- mergeWithControl(mb, ctrlObj, targColumn )
   }
 
 
@@ -223,19 +229,26 @@ prepareAtacInferCnvInput <- function(dataPath = "",
       if (!inherits(inObj, "Seurat")) {
         stop(paste0("Pre-computed input object is not Seurat object!"))
       }
-      if (!is.null(ctrlObj)) {
-        stop(paste0("Usage of external reference is not supported if pre-computed object is provided."))
-      }
+      #if (!is.null(ctrlObj)) {
+      #  stop(paste0("Usage of external reference is not supported if pre-computed object is provided."))
+      #}
       mb <- inObj
       annData <- inObj@meta.data
       if (! (targColumn %in% colnames(annData) ) ) {
         stop(paste("Required annotation column is not available in pre-computed input object:", targColumn))
       }
-      annInfo = summary(as.factor(annData[, targColumn]))
-      print(annInfo)
-      ctrlStatus = as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
-      if (any(ctrlStatus == 0) ) {
-        stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+      if (is.null(ctrlObj)) {
+        annInfo = summary(as.factor(annData[, targColumn]))
+        print(annInfo)
+        ctrlStatus = as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
+        if (any(ctrlStatus == 0) ) {
+          stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+        }
+      } else {
+         print("Merge with external control object")
+         mb <- mergeWithControl(mb,ctrlObj,targColumn)
+         ctrlGrp = "ExtControl"
+         #print(head(mb@meta.data))
       }
   }
 
