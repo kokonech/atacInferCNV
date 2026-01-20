@@ -1,5 +1,5 @@
 
-mergeWithControlInitial <- function(mb, ctrlObj, targColumn) {
+mergeWithControl <- function(mb, ctrlObj, targColumn) {
   # adjusted number of control cells should no go over 33% of number of tumor cells
   expNumCtrlCells <- round( 0.33 * ncol(mb))
   if (ncol(ctrlObj) > expNumCtrlCells) {
