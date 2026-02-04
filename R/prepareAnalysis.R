@@ -28,6 +28,7 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
     }
     print("Adjust for custom annotation")
     mb <- subset(mb, cells= cIds)
+    #mb <- mb[ ,cIds]
     #print(summary(rownames(mb@meta.data) == cIds))
     mb@meta.data <- cbind(mb@meta.data,  annData[rownames(mb@meta.data),targColumn])
     colnames(mb@meta.data)[ncol(mb@meta.data)] <- targColumn
@@ -157,38 +158,46 @@ prepareAtacInferCnvInput <- function(dataPath = "",
       stop("Input data folder is not found:",dataPath)
 
     }
-    # scMulti-omics
-    countsPath = paste0(dataPath,"/filtered_feature_bc_matrix.h5")
-    fragpath = paste0(dataPath, "/atac_fragments.tsv.gz")
-    # scAtac
-    countsPath2 = paste0(dataPath,"/filtered_peak_bc_matrix.h5")
-    if (!(file.exists(countsPath))) {
-      if (file.exists(countsPath2)) {
-        print("10X scATAC format identified")
-        countsVals = Read10X_h5(countsPath2)
-        fragpath = paste0(dataPath, "/fragments.tsv.gz")
+    if (dir.exists(dataPath)) {
+      print("Input is directory, assuming 10X data folder...")
+      # scMulti-omics
+      countsPath = paste0(dataPath,"/filtered_feature_bc_matrix.h5")
+      fragpath = paste0(dataPath, "/atac_fragments.tsv.gz")
+      # scAtac
+      countsPath2 = paste0(dataPath,"/filtered_peak_bc_matrix.h5")
+      if (!(file.exists(countsPath))) {
+        if (file.exists(countsPath2)) {
+          print("10X scATAC format identified")
+          countsVals = Read10X_h5(countsPath2)
+          fragpath = paste0(dataPath, "/fragments.tsv.gz")
+        } else {
+          stop(paste("Input feature counts matrix is not found in path:",dataPath,
+             "Expected formats: filtered_feature_bc_matrix.h5 or filtered_peak_bc_matrix.h5"))
+        }
       } else {
-        stop(paste("Input feature counts matrix is not found in path:",dataPath,
-           "Expected formats: filtered_feature_bc_matrix.h5 or filtered_peak_bc_matrix.h5"))
+        print("10X scMulti-omics format identified")
+        countsVals <- Read10X_h5(countsPath)$Peaks
       }
+
+
+      if (!(file.exists(fragpath))) {
+        stop("Input fragments loci is not found:",fragpath)
+      }
+
+      # create ATAC assay and add it to the object
+      chrom_assay  <- CreateChromatinAssay(
+        counts = countsVals,
+        sep = c(":", "-"),
+        fragments = fragpath
+      )
     } else {
-      print("10X scMulti-omics format identified")
-      countsVals <- Read10X_h5(countsPath)$Peaks
+      print("Input is a file, assuming peaks matrix...")
+      countsVals <- read.delim(dataPath,check.names = F)
+      chrom_assay  <- CreateChromatinAssay(
+        counts = countsVals,
+        sep = c(":", "-")
+      )
     }
-
-
-    if (!(file.exists(fragpath))) {
-      stop("Input fragments loci is not found:",fragpath)
-    }
-    #annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
-    #seqlevels(annotation) <- paste0('chr', seqlevels(annotation))
-
-    # create ATAC assay and add it to the object
-    chrom_assay  <- CreateChromatinAssay(
-      counts = countsVals,
-      sep = c(":", "-"),
-      fragments = fragpath
-    )
 
     mb <- CreateSeuratObject(
       counts = chrom_assay,
