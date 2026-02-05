@@ -1,0 +1,76 @@
+---
+title: "atacInferCnv: CNV inference from scATAC-seq data"
+author:
+- name: Konstantin Okonechnikov
+  affiliation: Hopp Children’s Cancer Center Heidelberg (KiTZ)
+  email: k.okonechnikov@kitz-heidelberg.de
+package: atacInferCnv
+output:
+  BiocStyle::html_document
+abstract: |
+  The package prepares input from scATAC-seq data and adapts it for copy number variance profiling with InferCNV toolkit. It has also various paramters to control the analysis (e.g. external reference, metacells formation, bin size, etc) and custom plot visualizations.
+vignette: |
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Getting started
+
+By default to launch atacInferCnv, the required input are:
+
+-   full epigenetic signals raw matrix;
+-   annotation of cells to distinguish tumor and normal.
+
+To demonstrate how to apply atacInferCNV scAtac-seq we prepared example test data set from a medulloblastoma Group 3/4 MYCN tumor case snMultiomics-seq data.
+
+The default input data for the package are file path to raw signals matrix in text format and file path to cells annotation. The annotation of cells is required to distinguish tumor vs normal cells, that are applied as reference control. Typical format of annotation is a tab-delimited table with row names (cell IDs) and only with column names in the first line.
+
+For input matrix other data formats are also supported, as described further, but here we will start with the path to the standard matrix and annotation in text format. For the launch also the path and name of the result should be stated. We will use temporary folder for this:
+
+```{r quick-start-1,  message=FALSE, warning=FALSE}
+library(atacInferCnv)
+inPath = system.file("extdata", "MB183_ATAC_subset.tsv.gz", 
+                     package = "atacInferCnv")
+sAnn = system.file("extdata", "MB183_ATAC_subset.CNV_blocks_ann.txt", 
+                   package = "atacInferCnv" )
+resPath = tempfile() 
+```
+
+atacInferCNV analysis is based on two main steps: 1) process the input data, adjust it for CNV calling and 2) launch [inferCnv](https://www.bioconductor.org/packages/release/bioc/html/infercnv.html) on this custom generated input.
+
+First step is the function that processes input data to prepare it for [InferCnv](https://www.bioconductor.org/packages/release/bioc/html/infercnv.html). It has multiple options, but requires name of the column in the annotation to distinguish tumor vs normal as well as the name of normal cell type that will be used as a reference in case if normal cells are present in the input object.
+
+```{r quick-start-3,  message=FALSE, warning=FALSE}
+prepareAtacInferCnvInput(inPath,sAnn,resPath,
+                         targColumn = "cnvBlock",
+                          ctrlGrp = "Normal")
+```
+
+This command performs initial processing for the data based on standard [Signac](https://github.com/stuart-lab/signac) R package application on scATAC-seq data and prepares the input for InferCnv. The results are saved in a specific format. Main generated output is saved in result folder. It includes signal matrix per cell and peaks genomic regions info as well as configuration for InferCnv. Additional output includes Signac/Seurat RDS object and UMAP visualization of the input data based on the annotation.
+
+The second and final step is the wrapper function to launch InferCnv. It uses the generated configuration inside result path to customize the input:
+
+```{r quick-start-4,  message=FALSE, warning=FALSE}
+runAtacInferCnv(resPath)
+```
+
+The generated output is saved inside the result path as infercnv subfolder. The function has specific parameters that require adjustment for ATAC-data such as for example number of clusters (numClusters). Importantly, it supports all options of the original inferCnv functions. These details could be checked from InferCnv [documentation](https://github.com/broadinstitute/inferCNV/wiki).
+
+# Custom settings
+
+The tool also provides various custom options to control the analysis. For example it supports output for 10X Multiomics or single cell ATAC data. If general scATAC anlaysis was already done by Signac/Seurat, then input object can be re-used without performing analysis on it. This could be especially useful for merged cases. atacInferCnv has corresponding argument. Moreover useful features such as meta-cell or genome binning are also available.
+
+We provide additional detailed tutorial and information at the project [wiki page](https://github.com/kokonech/atacInferCNV/wiki).
+
+# Applications
+
+Initial example application of the method was described in the following manuscript:
+
+[K. Okonechnikov et al "Oncogene aberrations drive medulloblastoma progression, not initiation", Nature, 2025](https://www.nature.com/articles/s41586-025-08973-5)
+
+# Session info {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
