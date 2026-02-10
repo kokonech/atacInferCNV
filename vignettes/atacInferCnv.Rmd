@@ -10,7 +10,7 @@ output:
 abstract: |
   The package prepares input from scATAC-seq data and adapts it for copy number variance profiling with InferCNV toolkit. It has also various paramters to control the analysis (e.g. external reference, metacells formation, bin size, etc) and custom plot visualizations.
 vignette: |
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{atacInferCnv: CNV inference from scATAC-seq data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

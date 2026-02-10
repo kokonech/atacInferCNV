@@ -5,17 +5,15 @@
 #' @param sample Input Seurat object to split
 #' @param targColumn Name of annotation column to split
 #' @param metacell_content Amount of cells for adjustment, default n=5
-#'
-#' @return NULL
-#' @export
+#' @return Invisibly returns NULL.
 #'
 extractMetacells <- function(resDir, sId, sample, targColumn, metacell_content = 5) {
 
   # Checking list:
   #Seurat::Idents(sample) <- sample$cluster_names
-  print(paste("Number of cells for meta-cell formation:",metacell_content))
+  message("Number of cells for meta-cell formation:",metacell_content)
   #print(targColumn)
-  targAnn <- factor(sample[[targColumn,drop=T]])
+  targAnn <- factor(sample[[targColumn,drop=TRUE]])
   #print(targAnn)
   rawCounts <- sample@assays$ATAC@counts
   #print(dim(rawCounts))
@@ -36,7 +34,7 @@ extractMetacells <- function(resDir, sId, sample, targColumn, metacell_content =
   for (cluster_id in levels(targAnn)){
     # custom version
     #for (cluster_id in levels(sample$)){
-    print(paste("Computing metacells for cluster", cluster_id))
+    message("Computing metacells for cluster", cluster_id)
     # Will store the metacells per cluster.
     metacells <- data.frame(test = rownames(rawCounts), row.names = rownames(rawCounts))
     #chunksample <- sample[, sample$cluster_names == cluster_id]
@@ -101,10 +99,13 @@ extractMetacells <- function(resDir, sId, sample, targColumn, metacell_content =
   # It would be wise to save the Seurat object with the metacell mapping.
 
   ann_file2 <- sprintf("%s/%s_metacells_mapping.tsv", resDir , sId)
-  write.table(sample@meta.data, ann_file2, sep="\t", quote=F)
+  write.table(sample@meta.data, ann_file2, sep="\t", quote=FALSE)
 
   mtxFile <- paste0(resDir,"/", sId, "_raw_matrix_metacells.txt.gz")
   gz1 <- gzfile(mtxFile, "w")
-  write.table(whole_metacells, gz1, quote=F,sep="\t")
+  write.table(whole_metacells, gz1, quote=FALSE,sep="\t")
   close(gz1)
+
+  invisible(NULL)
+
 }

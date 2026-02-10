@@ -1,5 +1,7 @@
-#' Wrapper function to run InferCNV calling using generated input data
+#' Wrapper function to run InferCNV calling
 #'
+#' This function calls InferCNV from generated input. It has support for all
+#' original inferCnv options.
 #' @param resDir Path to the result directory with input
 #' @param configFile Name of configuration file with InferCnv input data
 #' @param numClusters Number of clusters for hier. clustering. If equals one (by default)
@@ -9,7 +11,14 @@
 #' @param clusterRefs Cluster also reference (InferCNV param). Default: FALSE
 #' @param smoothMethod Method for smoothing (InferCNV param). Default: runmeans
 #' @param ... Other parameters to provide for infercnv::run, more details in documentation of this function
-#' @return NULL
+#' @return Invisibly returns NULL.
+#' @examples
+#' resPath = tempfile()
+#' inPath = system.file("extdata", "MB183_ATAC_subset.tsv.gz", package = "atacInferCnv")
+#' sAnn = system.file("extdata", "MB183_ATAC_subset.CNV_blocks_ann.txt", package = "atacInferCnv" )
+#' prepareAtacInferCnvInput(inPath,sAnn,resPath, targColumn = "cnvBlock", ctrlGrp = "Normal")
+#' runAtacInferCnv(resPath)
+#'
 #' @export
 #'
 runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
@@ -27,21 +36,21 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
   on.exit(setwd(originalDir))
   setwd(resDir)
 
-  print(paste("Loading InferCNV configuration from:",configFile))
+  message(paste("Loading InferCNV configuration from:",configFile))
   cfg <- config::get(file=configFile)
 
-  print(paste("Processing",cfg$resName))
-  print(paste("Input:",cfg$countsFile))
-  print(paste("Annotation:",cfg$annFile))
-  print(paste("Normal clusters:",cfg$refGroup))
-  print(paste("Cut off:",cfg$cutOff))
+  message(paste("Processing",cfg$resName))
+  message(paste("Input:",cfg$countsFile))
+  message(paste("Annotation:",cfg$annFile))
+  message(paste("Normal clusters:",cfg$refGroup))
+  message(paste("Cut off:",cfg$cutOff))
 
   groupUsage <- ifelse(numClusters > 1,FALSE,TRUE)
-  print(paste("Num tumor clusters:",numClusters))
+  message(paste("Num tumor clusters:",numClusters))
 
   refGroups <- str_split(cfg$refGroups,",")[[1]]
 
-  print(paste("Assign custom reference:",cfg$customRef))
+  message(paste("Assign custom reference:",cfg$customRef))
   geneOrderRef = cfg$customRef
 
 
@@ -72,4 +81,5 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
 
   )
 
+  invisible(NULL)
 }

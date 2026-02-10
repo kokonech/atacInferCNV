@@ -3,38 +3,46 @@
 #'
 #' This function creates a plot for CNV assigned/identified subclones
 #' @param resDir Path to the result directory with input
-#'
+#' @return Invisibly returns NULL.
+#' @examples
+#' resPath = tempfile()
+#' inPath = system.file("extdata", "MB183_ATAC_subset.tsv.gz", package = "atacInferCnv")
+#' sAnn = system.file("extdata", "MB183_ATAC_subset.CNV_blocks_ann.txt", package = "atacInferCnv" )
+#' prepareAtacInferCnvInput(inPath,sAnn,resPath, targColumn = "cnvBlock", ctrlGrp = "Normal")
+#' runAtacInferCnv(resPath)
+#' plotCnvBlocks(resPath)
 #' @export
+
 plotCnvBlocks <- function( resDir) {
 
-  cnvDir = paste0(resDir,"/sample_infercnv")
+  cnvDir <- paste0(resDir,"/sample_infercnv")
   if (!(dir.exists(cnvDir))) {
     stop("The result directory with InferCNV input does not exist:",resDir)
   }
 
   infercnv_obj <- readRDS(paste0(cnvDir, "/run.final.infercnv_obj"))
 
-  print("Load InferCNV result...")
+  message("Load InferCNV result...")
 
-  obsFile = paste0(cnvDir,"/infercnv.observations.txt")
+  obsFile <- paste0(cnvDir,"/infercnv.observations.txt")
   if (file.exists(obsFile)) {
-    cnvMtx <- read.table(obsFile,check.names = F)
+    cnvMtx <- read.table(obsFile,check.names = FALSE)
   } else {
     warning("Output file infercnv.observations.txt does not exist in result folder, using expr matrix.\n
          Update InferCnv version (>= 1.3.3 ) to support normalized output.")
-    cIds = unlist(infercnv_obj@observation_grouped_cell_indices)
+    cIds <- unlist(infercnv_obj@observation_grouped_cell_indices)
     cnvMtx <- infercnv_obj@expr.data[ ,cIds]
   }
   gnMtx <- infercnv_obj@gene_order
 
-  cMax = max(cnvMtx)
-  cMin = min(cnvMtx)
-  cMean = mean(rowMeans(cnvMtx))
+  cMax <- max(cnvMtx)
+  cMin <- min(cnvMtx)
+  cMean <- mean(rowMeans(cnvMtx))
 
   # draw lines
   curChr <- "1"
   breaks <- c()
-  for (i in 1:nrow(gnMtx)) {
+  for (i in seq_len(nrow(gnMtx))) {
     chrId <- as.character(gnMtx[i,1] )
     if (chrId != curChr) {
       #print(chrId)
@@ -44,34 +52,34 @@ plotCnvBlocks <- function( resDir) {
   }
 
   chrBorders <- c(1,breaks,nrow(gnMtx))
-  names(chrBorders) <- c(1:22,"")
+  names(chrBorders) <- c(seq_len(22),"")
 
   rbPal <- colorRampPalette(c('red','green'))
-  chrBreaks = breaks
+  chrBreaks <- breaks
   if (infercnv_obj@options$k_obs_groups  == 1) {
     blocks <- c("Full", names(infercnv_obj@tumor_subclusters$subclusters))
   } else {
     hcBlocks <- cutree(infercnv_obj@tumor_subclusters$hc$all_observations, infercnv_obj@options$k_obs_groups )
     hcBlocksAdj <- paste0("C",hcBlocks)
-    names(hcBlocksAdj) = names(hcBlocks)
+    names(hcBlocksAdj) <- names(hcBlocks)
     blocks <- c("Full", unique(hcBlocksAdj))
   }
-  resName = paste0(cnvDir,"/subclone_CNV_plot.pdf")
+  resName <- paste0(cnvDir,"/subclone_CNV_plot.pdf")
   pdf(resName, width = 14, height= 6)
 
   for (targ in blocks) {
-    print(targ)
+    message(targ)
     if (targ == "Full") {
-        vals = rowMeans(cnvMtx)
+        vals<-rowMeans(cnvMtx)
     } else {
       if (infercnv_obj@options$k_obs_groups  == 1) {
         cellIds <-names(infercnv_obj@tumor_subclusters$subclusters[[targ]][[1]])
         if (sum(cellIds %in% colnames(cnvMtx)) == 0) {
-          print("Skipping...")
+          message("Skipping...")
           next
         }
       } else {
-        cellIds = names(hcBlocksAdj)[hcBlocksAdj == targ]
+        cellIds <- names(hcBlocksAdj)[hcBlocksAdj == targ]
       }
       vals <- rowMeans(cnvMtx[,cellIds])
     }
@@ -93,4 +101,5 @@ plotCnvBlocks <- function( resDir) {
 
   dev.off()
 
+  invisible(NULL)
 }

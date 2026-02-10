@@ -17,6 +17,9 @@ aggregateBins(sample, resDir, sId, bin_size, chrom_lengths)
 
 \item{chrom_lengths}{Numeric vector of chromosome sizes, specific for genome}
 }
+\value{
+Seurat object
+}
 \description{
 Combine ATAC signals across bins of specific size
 }

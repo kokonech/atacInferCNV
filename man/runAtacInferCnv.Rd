@@ -2,7 +2,7 @@
 % Please edit documentation in R/runAtacInferCnv.R
 \name{runAtacInferCnv}
 \alias{runAtacInferCnv}
-\title{Wrapper function to run InferCNV calling using generated input data}
+\title{Wrapper function to run InferCNV calling}
 \usage{
 runAtacInferCnv(
   resDir,
@@ -33,6 +33,18 @@ then no clustering is performed and provided annoitation used for the formation 
 
 \item{...}{Other parameters to provide for infercnv::run, more details in documentation of this function}
 }
+\value{
+Invisibly returns NULL.
+}
 \description{
-Wrapper function to run InferCNV calling using generated input data
+This function calls InferCNV from generated input. It has support for all
+original inferCnv options.
+}
+\examples{
+resPath = tempfile()
+inPath = system.file("extdata", "MB183_ATAC_subset.tsv.gz", package = "atacInferCnv")
+sAnn = system.file("extdata", "MB183_ATAC_subset.CNV_blocks_ann.txt", package = "atacInferCnv" )
+prepareAtacInferCnvInput(inPath,sAnn,resPath, targColumn = "cnvBlock", ctrlGrp = "Normal")
+runAtacInferCnv(resPath)
+
 }

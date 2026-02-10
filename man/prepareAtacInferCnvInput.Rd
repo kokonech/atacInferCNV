@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepareAnalysis.R
 \name{prepareAtacInferCnvInput}
 \alias{prepareAtacInferCnvInput}
-\title{Prepare analysis for the CNV calling from ATAC data}
+\title{Prepare input for the CNV calling from scATAC-seq data}
 \usage{
 prepareAtacInferCnvInput(
   dataPath = "",
@@ -19,13 +19,13 @@ prepareAtacInferCnvInput(
 )
 }
 \arguments{
-\item{dataPath}{Path to the input data in 10X format}
+\item{dataPath}{Path to the input data in 10X format or ATAC counts matrix in txt format (gzipped)}
 
-\item{annPath}{Path to annotation of the cells in the target column}
+\item{annPath}{Path to annotation of the cells}
 
 \item{resDir}{Path to the result directory}
 
-\item{inObj}{Precomputed Seurat/Signac object with required input data}
+\item{inObj}{Precomputed Seurat/Signac object with required input data (alternative for dataPath)}
 
 \item{sId}{Result name. Default: "Sample"}
 
@@ -42,6 +42,16 @@ e.g. 500000 for 500 KBp. Default: NULL (not use this option)}
 
 \item{metaCells}{Set TRUE to use meta cells (n=5 cells will be used to merge) or assign a number of cells. Default: FALSE}
 }
+\value{
+Invisibly returns NULL.
+}
 \description{
-Prepare analysis for the CNV calling from ATAC data
+Prepare input for the CNV calling from scATAC-seq data
+}
+\examples{
+resPath = tempfile()
+inPath = system.file("extdata", "MB183_ATAC_subset.tsv.gz", package = "atacInferCnv")
+sAnn = system.file("extdata", "MB183_ATAC_subset.CNV_blocks_ann.txt", package = "atacInferCnv" )
+prepareAtacInferCnvInput(inPath,sAnn,resPath, targColumn = "cnvBlock", ctrlGrp = "Normal")
+
 }

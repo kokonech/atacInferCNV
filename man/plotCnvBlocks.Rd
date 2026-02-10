@@ -9,6 +9,17 @@ plotCnvBlocks(resDir)
 \arguments{
 \item{resDir}{Path to the result directory with input}
 }
+\value{
+Invisibly returns NULL.
+}
 \description{
 This function creates a plot for CNV assigned/identified subclones
+}
+\examples{
+resPath = tempfile()
+inPath = system.file("extdata", "MB183_ATAC_subset.tsv.gz", package = "atacInferCnv")
+sAnn = system.file("extdata", "MB183_ATAC_subset.CNV_blocks_ann.txt", package = "atacInferCnv" )
+prepareAtacInferCnvInput(inPath,sAnn,resPath, targColumn = "cnvBlock", ctrlGrp = "Normal")
+runAtacInferCnv(resPath)
+plotCnvBlocks(resPath)
 }

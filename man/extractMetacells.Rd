@@ -17,6 +17,9 @@ extractMetacells(resDir, sId, sample, targColumn, metacell_content = 5)
 
 \item{metacell_content}{Amount of cells for adjustment, default n=5}
 }
+\value{
+Invisibly returns NULL.
+}
 \description{
 Compute meta-cells out of the main
 }

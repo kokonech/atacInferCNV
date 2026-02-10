@@ -6,8 +6,7 @@
 #' @param bin_size Size of the bin e.g. 100000 for 100Kbp
 #' @param chrom_lengths Numeric vector of chromosome sizes, specific for genome
 #'
-#' @return NULL
-#' @export
+#' @return Seurat object
 #'
 aggregateBins <- function(sample, resDir, sId, bin_size, chrom_lengths) {
 
@@ -39,15 +38,15 @@ aggregateBins <- function(sample, resDir, sId, bin_size, chrom_lengths) {
 
   # re-write raw counts matrix
   gz2 <- gzfile(sprintf("%s/%s_raw_counts.txt.gz", resDir,sId), "w")
-  write.table(binned_signal,gz2,sep="\t",quote=F)
+  write.table(binned_signal,gz2,sep="\t",quote=FALSE)
   close(gz2)
 
-  peakDf <- data.frame(bins)[,1:3]
+  peakDf <- data.frame(bins)[,seq_len(3)]
   rownames(peakDf) <- paste0(  peakDf[,1],":",peakDf[,2],"-",peakDf[,3] )
   peakDf$seqnames <- gsub("chr","", peakDf$seqnames)
   summary(rownames(binned_signal) == rownames(peakDf))
   write.table(peakDf, sprintf("%s/%s_cnv_ref.binsize_%d.txt", resDir, sId,bin_size),
-              col.names = F,sep="\t",quote=F)
+              col.names = FALSE,sep="\t",quote=FALSE)
 
   # assign and return novel matrix for possible further analysis: meta-cells
   sample@assays$ATAC@counts <- binned_signal

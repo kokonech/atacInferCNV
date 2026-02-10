@@ -5,11 +5,9 @@
 #' @param ctrlGrp Name for the reference control cell type
 #' @param binSize Size of the bin e.g. 100000 for 100Kbp
 #' @param meta True if use meta cells, default false
+#' @return Invisibly returns NULL.
 #'
-#' @return NULL
-#' @export
-#'
-writeConfig <- function(resDir, sId , ctrlGrp = "Normal", binSize=NULL,meta=F ) {
+writeConfig <- function(resDir, sId , ctrlGrp = "Normal", binSize=NULL,meta=FALSE ) {
 
   if (meta) {
     inputFile = paste0(sId,"_raw_matrix_metacells.txt.gz")
@@ -43,4 +41,5 @@ writeConfig <- function(resDir, sId , ctrlGrp = "Normal", binSize=NULL,meta=F ) 
 
   # Write to config.yml
   writeLines(config_content, paste0(resDir,"infercnv_config.yml"))
+  invisible(NULL)
 }

@@ -2,8 +2,7 @@ Package: atacInferCnv
 Type: Package
 Title: Call CNV from single cell ATAC-seq data based on InferCNV adaptation
 Version: 0.2.0
-Author: Konstantin Okonechnikov
-Maintainer: Konstantin Okonechnikov <k.okonechnikov@gmail.com>
+Authors@R: c( person("Konstantin", "Okonechnikov",email = "k.okonechnikov@gmail.com", role = c("aut","cre")) )
 Description: The package prepares input scATAC-seq data and adapts for copy number variance profiling with InferCNV package usage. It has also various paramters to control the analysis (e.g. external reference, metacellc, bin size, etc) and custom plot visualizations.   
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
