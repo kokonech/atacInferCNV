@@ -3,7 +3,7 @@ mergeWithControl <- function(mb, ctrlObj, targColumn) {
   # adjusted number of control cells should no go over 33% of number of tumor cells
   expNumCtrlCells <- round( 0.33 * ncol(mb))
   if (ncol(ctrlObj) > expNumCtrlCells) {
-    message(paste("Adjust external control, decrease num cells to",expNumCtrlCells))
+    message("Adjust external control, decrease num cells to",expNumCtrlCells)
     ctrlObj <- ctrlObj[ , seq_len(expNumCtrlCells)]
   }
   #print(ctrlObj)
@@ -22,9 +22,9 @@ mergeWithControl <- function(mb, ctrlObj, targColumn) {
 
 prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
   if (!is.null(annData)) {
-    cIds = intersect(rownames(annData), rownames(mb@meta.data))
+    cIds <- intersect(rownames(annData), rownames(mb@meta.data))
     if (length(cIds) == 0) {
-      message("Error: no overlapping cells IDs in annotation")
+      stop("No overlapping cells IDs in annotation!")
     }
     message("Adjust for custom annotation")
     mb <- subset(mb, cells= cIds)
@@ -36,7 +36,7 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
     mb <- NucleosomeSignal(mb)
     mb <- TSSEnrichment(mb)
 
-    resName = paste0(resDir, sId,"_VlnPlot_QC.pdf")
+    resName <- paste0(resDir, sId,"_VlnPlot_QC.pdf")
     pdf(resName, width=8,height=6)
     VlnPlot(
       object = mb,
@@ -73,7 +73,7 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
 
   print("Dimensional reduction...")
 
-  ndim = 30 # default 30
+  ndim <- 30 # default 30
 
   mb <- RunUMAP(object = mb, reduction = 'lsi', dims = 2:ndim)
   mb <- FindNeighbors(object = mb, reduction = 'lsi', dims = 2:ndim)
@@ -166,15 +166,15 @@ prepareAtacInferCnvInput <- function(dataPath = "",
     if (dir.exists(dataPath)) {
       message("Input is directory, assuming 10X data folder...")
       # scMulti-omics
-      countsPath = paste0(dataPath,"/filtered_feature_bc_matrix.h5")
-      fragpath = paste0(dataPath, "/atac_fragments.tsv.gz")
+      countsPath <- paste0(dataPath,"/filtered_feature_bc_matrix.h5")
+      fragpath <- paste0(dataPath, "/atac_fragments.tsv.gz")
       # scAtac
-      countsPath2 = paste0(dataPath,"/filtered_peak_bc_matrix.h5")
+      countsPath2 <- paste0(dataPath,"/filtered_peak_bc_matrix.h5")
       if (!(file.exists(countsPath))) {
         if (file.exists(countsPath2)) {
           message("10X scATAC format identified")
-          countsVals = Read10X_h5(countsPath2)
-          fragpath = paste0(dataPath, "/fragments.tsv.gz")
+          countsVals <- Read10X_h5(countsPath2)
+          fragpath <- paste0(dataPath, "/fragments.tsv.gz")
         } else {
           stop(paste("Input feature counts matrix is not found in path:",dataPath,
              "Expected formats: filtered_feature_bc_matrix.h5 or filtered_peak_bc_matrix.h5"))
@@ -234,7 +234,7 @@ prepareAtacInferCnvInput <- function(dataPath = "",
         }
         message("Using external control (assigned as ExtControl)")
         #print(ctrlObj)
-        ctrlGrp = "ExtControl"
+        ctrlGrp <- "ExtControl"
       }
 
     }
@@ -252,21 +252,21 @@ prepareAtacInferCnvInput <- function(dataPath = "",
         stop(paste("Required annotation column is not available in pre-computed input object:", targColumn))
       }
       if (is.null(ctrlObj)) {
-        annInfo = summary(as.factor(annData[, targColumn]))
+        annInfo <- summary(as.factor(annData[, targColumn]))
         print(annInfo)
-        ctrlStatus = as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
+        ctrlStatus <- as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
         if (any(ctrlStatus == 0) ) {
           stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
         }
       } else {
          message("Merge with external control object")
          mb <- mergeWithControl(mb,ctrlObj,targColumn)
-         ctrlGrp = "ExtControl"
+         ctrlGrp <- "ExtControl"
          #print(head(mb@meta.data))
       }
   }
 
-  resDir = paste0(resDir,"/") # make sure subfolder usage
+  resDir <- paste0(resDir,"/") # make sure subfolder usage
   if (!(dir.exists(resDir))) {
     print(paste("Creating result directory:", resDir))
     dir.create(resDir)

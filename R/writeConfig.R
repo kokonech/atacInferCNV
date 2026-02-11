@@ -10,23 +10,21 @@
 writeConfig <- function(resDir, sId , ctrlGrp = "Normal", binSize=NULL,meta=FALSE ) {
 
   if (meta) {
-    inputFile = paste0(sId,"_raw_matrix_metacells.txt.gz")
-    annFile = paste0(sId,"_annotation_metacells.tsv")
-    cutOff = 0.25
+    inputFile <- paste0(sId,"_raw_matrix_metacells.txt.gz")
+    annFile <- paste0(sId,"_annotation_metacells.tsv")
+    cutOff <- 0.25 # depends on meta block size, adjusted for n= 5
   } else {
-    inputFile = paste0(sId,"_raw_counts.txt.gz")
-    annFile = paste0(sId,"_cnv_ann.txt")
-    cutOff = 0.1
+    inputFile <- paste0(sId,"_raw_counts.txt.gz")
+    annFile <- paste0(sId,"_cnv_ann.txt")
+    cutOff <- 0.1
   }
 
-  customRef = paste0(sId, "_cnv_ref.txt")
+  customRef <- paste0(sId, "_cnv_ref.txt")
 
   if (!is.null(binSize)) {
-    customRef = gsub(".txt",sprintf(".binsize_%d.txt", binSize), customRef)
+    customRef <- gsub(".txt",sprintf(".binsize_%d.txt", binSize), customRef)
   }
 
-
-  numClusters = 3
 
   config_content <- paste0("
   default:
@@ -36,7 +34,6 @@ writeConfig <- function(resDir, sId , ctrlGrp = "Normal", binSize=NULL,meta=FALS
     customRef: '", customRef, "'
     refGroups: '", ctrlGrp, "'
     cutOff: ", cutOff, "
-    numClusters: ", numClusters, "
   ")
 
   # Write to config.yml

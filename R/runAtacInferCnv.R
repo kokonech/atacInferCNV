@@ -51,11 +51,11 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
   refGroups <- str_split(cfg$refGroups,",")[[1]]
 
   message(paste("Assign custom reference:",cfg$customRef))
-  geneOrderRef = cfg$customRef
+  geneOrderRef <- cfg$customRef
 
 
   # specific:  selected cluster as reference
-  infercnv_obj = CreateInfercnvObject(raw_counts_matrix=cfg$countsFile,
+  infercnv_obj <- CreateInfercnvObject(raw_counts_matrix=cfg$countsFile,
                                       annotations_file=cfg$annFile,
                                       delim="\t",
                                       gene_order_file=geneOrderRef,
@@ -66,7 +66,7 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
   # this is required to allow plots, otherwise there is a fail in plotting
   assign("infercnv_obj", infercnv_obj, envir = .GlobalEnv)
 
-  infercnv_obj = infercnv::run(infercnv_obj ,
+  infercnv_obj <- infercnv::run(infercnv_obj ,
                                # cutoff: 1 for SmartSeq, 0.1 for 10x Genomics, mean to meta
                                cutoff=cfg$cutOff,
                                out_dir=cfg$resName,
