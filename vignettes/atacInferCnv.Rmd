@@ -22,7 +22,7 @@ By default to launch atacInferCnv, the required input are:
 -   full epigenetic signals raw matrix;
 -   annotation of cells to distinguish tumor and normal.
 
-To demonstrate how to apply atacInferCNV scAtac-seq we prepared example test data set from a medulloblastoma Group 3/4 MYCN tumor case snMultiomics-seq data.
+To demonstrate how to apply atacInferCNV scAtac-seq data we prepared example test set from a medulloblastoma Group 3/4 MYCN tumor case snMultiomics-seq data.
 
 The default input data for the package are file path to raw signals matrix in text format and file path to cells annotation. The annotation of cells is required to distinguish tumor vs normal cells, that are applied as reference control. Typical format of annotation is a tab-delimited table with row names (cell IDs) and only with column names in the first line.
 
@@ -59,7 +59,7 @@ The generated output is saved inside the result path as infercnv subfolder. The 
 
 # Custom settings
 
-The tool also provides various custom options to control the analysis. For example it supports output for 10X Multiomics or single cell ATAC data. If general scATAC anlaysis was already done by Signac/Seurat, then input object can be re-used without performing analysis on it. This could be especially useful for merged cases. atacInferCnv has corresponding argument. Moreover useful features such as meta-cell or genome binning are also available.
+The tool also provides various custom options to control the analysis. For example it supports as input 10X Multiomics or single cell ATAC processed data from CellRanger. If general scATAC anlaysis was already done by Signac/Seurat, then created input object can be re-used without performing additional analysis to create it. This could be especially useful for merged or large samples and atacInferCnv has corresponding argument. Moreover several useful features such as external reference, meta-cell or genome binning are also available.
 
 We provide additional detailed tutorial and information at the project [wiki page](https://github.com/kokonech/atacInferCNV/wiki).
 

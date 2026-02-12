@@ -71,7 +71,7 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
   mb <- FindTopFeatures(mb, min.cutoff = 'q0')
   mb <- RunSVD(mb)
 
-  print("Dimensional reduction...")
+  message("Dimensional reduction...")
 
   ndim <- 30 # default 30
 
@@ -80,9 +80,11 @@ prepareAnalysis <- function(mb, resDir, sId, annData, targColumn, ctrlObj) {
   mb <- FindClusters(object = mb, verbose = FALSE, algorithm = 3)
 
   pdf(paste0(resDir,sId,"_UMAP.pdf"),width = 8, height = 6)
+  # print REQUIRED for ggplot2 output
   print(DimPlot(object = mb, pt.size=1, label=TRUE))
   if (nchar(targColumn) > 0) {
-    print(DimPlot(mb, reduction = "umap", label = TRUE,group.by = targColumn))
+    print(DimPlot(mb, reduction = "umap",
+                  label = TRUE,group.by = targColumn)) # REQUIRED for ggplot2 output
   }
   dev.off()
 
@@ -176,8 +178,8 @@ prepareAtacInferCnvInput <- function(dataPath = "",
           countsVals <- Read10X_h5(countsPath2)
           fragpath <- paste0(dataPath, "/fragments.tsv.gz")
         } else {
-          stop(paste("Input feature counts matrix is not found in path:",dataPath,
-             "Expected formats: filtered_feature_bc_matrix.h5 or filtered_peak_bc_matrix.h5"))
+          stop("Input feature counts matrix is not found in path: ",dataPath,
+             "\nExpected formats: filtered_feature_bc_matrix.h5 or filtered_peak_bc_matrix.h5")
         }
       } else {
         message("10X scMulti-omics format identified")
@@ -211,26 +213,26 @@ prepareAtacInferCnvInput <- function(dataPath = "",
     )
 
     if (!(file.exists(annPath))) {
-      stop(paste("Annotation file is not found:",annPath))
+      stop("Annotation file is not found: ",annPath)
 
     }
     annData <- read.delim(annPath)
 
     if (! (targColumn %in% colnames(annData) ) ) {
-      stop(paste("Required annotation column is not available:", targColumn))
+      stop("Required annotation column is not available: ", targColumn)
     } else {
-      message(paste("Using target annotation column:",targColumn))
+      message("Using target annotation column: ",targColumn)
       #print(class(annData[, targColumn]))
       if (is.null(ctrlObj)) {
         annInfo <- summary(as.factor(annData[, targColumn]))
         message(annInfo)
         ctrlStatus <- as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
         if (any(ctrlStatus == 0) ) {
-          stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+          stop("Non-tumor control group is not found in annotation: ", ctrlGrp)
         }
       } else {
         if (!inherits(ctrlObj, "Seurat")) {
-          stop(paste0("Non-tumor external control input is not Seurat object!"))
+          stop("Non-tumor external control input is not Seurat object!")
         }
         message("Using external control (assigned as ExtControl)")
         #print(ctrlObj)
@@ -241,7 +243,7 @@ prepareAtacInferCnvInput <- function(dataPath = "",
   } else {
       message("Using existing Signac/Seurat object")
       if (!inherits(inObj, "Seurat")) {
-        stop(paste0("Pre-computed input object is not Seurat object!"))
+        stop("Pre-computed input object is not Seurat object!")
       }
       #if (!is.null(ctrlObj)) {
       #  stop(paste0("Usage of external reference is not supported if pre-computed object is provided."))
@@ -249,14 +251,14 @@ prepareAtacInferCnvInput <- function(dataPath = "",
       mb <- inObj
       annData <- inObj@meta.data
       if (! (targColumn %in% colnames(annData) ) ) {
-        stop(paste("Required annotation column is not available in pre-computed input object:", targColumn))
+        stop("Required annotation column is not available in pre-computed input object: ", targColumn)
       }
       if (is.null(ctrlObj)) {
         annInfo <- summary(as.factor(annData[, targColumn]))
-        print(annInfo)
+        message(annInfo)
         ctrlStatus <- as.numeric(str_split_1(ctrlGrp,pattern = ",") %in% names(annInfo))
         if (any(ctrlStatus == 0) ) {
-          stop(paste("Non-tumor control group is not found in annotation:", ctrlGrp))
+          stop("Non-tumor control group is not found in annotation: ", ctrlGrp)
         }
       } else {
          message("Merge with external control object")
@@ -268,7 +270,7 @@ prepareAtacInferCnvInput <- function(dataPath = "",
 
   resDir <- paste0(resDir,"/") # make sure subfolder usage
   if (!(dir.exists(resDir))) {
-    print(paste("Creating result directory:", resDir))
+    message("Creating result directory: ", resDir)
     dir.create(resDir)
   }
 
@@ -287,7 +289,7 @@ prepareAtacInferCnvInput <- function(dataPath = "",
   message("Save signal...")
   saveCnvInput(mb, resDir, sId, targColumn)
   if (!is.null(binSize)) {
-    message(paste("Re-format input signal matrix for bins of size", binSize))
+    message("Re-format input signal matrix for bins of size ", binSize)
     mb <- aggregateBins(mb, resDir, sId, binSize, chromLength)
   }
   #print(head(mb@meta.data))

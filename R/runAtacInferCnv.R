@@ -36,21 +36,21 @@ runAtacInferCnv <- function(resDir, configFile = "infercnv_config.yml",
   on.exit(setwd(originalDir))
   setwd(resDir)
 
-  message(paste("Loading InferCNV configuration from:",configFile))
+  message("Loading InferCNV configuration from: ",configFile)
   cfg <- config::get(file=configFile)
 
-  message(paste("Processing",cfg$resName))
-  message(paste("Input:",cfg$countsFile))
-  message(paste("Annotation:",cfg$annFile))
-  message(paste("Normal clusters:",cfg$refGroup))
-  message(paste("Cut off:",cfg$cutOff))
+  message("Processing ",cfg$resName)
+  message("Input: ",cfg$countsFile)
+  message("Annotation: ",cfg$annFile)
+  message("Normal clusters: ",cfg$refGroup)
+  message("Cut off: ",cfg$cutOff)
 
   groupUsage <- ifelse(numClusters > 1,FALSE,TRUE)
-  message(paste("Num tumor clusters:",numClusters))
+  message("Num tumor clusters: ",numClusters)
 
   refGroups <- str_split(cfg$refGroups,",")[[1]]
 
-  message(paste("Assign custom reference:",cfg$customRef))
+  message("Assign custom reference: ",cfg$customRef)
   geneOrderRef <- cfg$customRef
 
 

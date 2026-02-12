@@ -94,6 +94,7 @@ plotCnvBlocks <- function( resDir) {
       p <- p + axis(side=1,at=chrBorders,labels=names(chrBorders),cex.axis=0.45 )
     }
 
+    # print REQUIRED for ggplot2 output
     #abline(v=markerLoci, col="red", lwd=0.2, lty=2)
     p <- p + axis(side=2,seq(round(cMin,2),round(cMax,2),0.01) )
     print(p)

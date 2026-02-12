@@ -6,7 +6,7 @@ Authors@R: c( person("Konstantin", "Okonechnikov",email = "k.okonechnikov@gmail.
 Description: The package prepares input scATAC-seq data and adapts for copy number variance profiling with InferCNV package usage. It has also various paramters to control the analysis (e.g. external normal reference usage, meta-cells, bin size, etc) and custom plot visualizations.   
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
-Depends: R (>= 4.0),utils
+Depends: R (>= 4.3.0),utils
 Imports: 
     infercnv (>= 1.3.1),
     Signac,
@@ -20,6 +20,8 @@ Imports:
 biocViews: Epigenetics, Sequencing,  CopyNumberVariation,
         SingleCell,ImmunoOncology
 VignetteBuilder: knitr
+URL: https://github.com/kokonech/atacInferCNV
+BugReports: https://github.com/kokonech/atacInferCNV/issues
 Suggests: 
     testthat (>= 3.0.0),
     BiocStyle,
